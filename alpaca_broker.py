@@ -1,5 +1,6 @@
 import os
 import logging
+from pathlib import Path
 from typing import Dict, Optional, Any
 from dotenv import load_dotenv
 
@@ -7,8 +8,9 @@ from alpaca.trading.client import TradingClient
 from alpaca.trading.requests import MarketOrderRequest
 from alpaca.trading.enums import OrderSide, TimeInForce
 
-# Load .env variables
-load_dotenv()
+# Load .env from the trading root (parent of this file's directory)
+_TRADING_ROOT = Path(__file__).resolve().parents[1]
+load_dotenv(dotenv_path=_TRADING_ROOT / ".env", override=False)
 
 logger = logging.getLogger(__name__)
 
@@ -67,6 +69,24 @@ class AlpacaBroker:
         except Exception as e:
             logger.error(f"Failed to submit {side} order for {symbol}: {e}")
             return None
+
+    def get_order(self, order_id: str) -> Optional[Any]:
+        """Fetch a specific order by ID."""
+        try:
+            return self.client.get_order_by_id(order_id)
+        except Exception as e:
+            logger.error(f"Failed to get order {order_id}: {e}")
+            return None
+            
+    def get_open_orders(self) -> list:
+        """Fetch all open orders."""
+        from alpaca.trading.requests import GetOrdersRequest
+        try:
+            req = GetOrdersRequest(status="open")
+            return self.client.get_orders(req)
+        except Exception as e:
+            logger.error(f"Failed to get open orders: {e}")
+            return []
 
     def close_position(self, symbol: str) -> Optional[Any]:
         """Liquidate the entire position for a given symbol."""

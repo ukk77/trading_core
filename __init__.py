@@ -1,7 +1,7 @@
 """Shared core library for trading strategies."""
 
 from .portfolio import Portfolio, Trade
-from .alpaca_broker import AlpacaBroker
+# Do not import AlpacaBroker by default to avoid 'alpaca' requirement for downstream apps like risk_calculator
 from .metrics import (
     total_return,
     cagr,
@@ -19,7 +19,6 @@ from .metrics import (
 __all__ = [
     "Portfolio",
     "Trade",
-    "AlpacaBroker",
     "total_return",
     "cagr",
     "sharpe_ratio",
