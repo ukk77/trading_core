@@ -27,12 +27,19 @@ class AlpacaBroker:
         self.client = TradingClient(api_key, secret_key, paper=paper)
 
     def get_account_info(self) -> Dict[str, float]:
-        """Fetch current account balances."""
+        """Fetch current account balances.
+
+        equity      — current total account value (cash + positions).
+        last_equity — account value at the previous trading day's close;
+                      (equity - last_equity) / last_equity is the true intraday return.
+        """
         account = self.client.get_account()
         return {
             "cash": float(account.cash),
             "portfolio_value": float(account.portfolio_value),
             "buying_power": float(account.buying_power),
+            "equity": float(account.equity),
+            "last_equity": float(account.last_equity),
         }
 
     def get_positions(self) -> Dict[str, Dict[str, Any]]:
